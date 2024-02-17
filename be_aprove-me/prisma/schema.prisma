@@ -7,22 +7,22 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.sqlite"
 }
 
-model Receivable {
+model Payable {
   id           String    @id @default(uuid())
   value        Float
   emissionDate DateTime
-  assignor     Cedent    @relation(fields: [assignorId], references: [id])
-  assignorId   Int
+  assignor     Assignor  @relation(fields: [assignorId], references: [id])
+  assignorId   String
 }
 
-model Cedent {
-  id       Int       @id @default(autoincrement())
+model Assignor {
+  id       String    @id @default(uuid())
   document String    @unique
   email    String
   phone    String
   name     String
-  receivables Receivable[]
+  payables Payable[]
 }
