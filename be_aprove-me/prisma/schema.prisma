@@ -15,14 +15,23 @@ model Payable {
   value        Float
   emissionDate DateTime
   assignor     Assignor  @relation(fields: [assignorId], references: [id])
-  assignorId   String
+  assignorId   Int
 }
 
 model Assignor {
-  id       String    @id @default(uuid())
-  document String    @unique
-  email    String
-  phone    String
-  name     String
+  id       Int      @id @default(autoincrement())
+  document String   @unique
+  email    String   
+  phone    String   
+  name     String   
   payables Payable[]
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  login        String   @unique
+  password     String
+  token        String?
+  refreshToken String?
+  active   Boolean  @default(true)
 }

@@ -1,4 +1,13 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Put,
+  Delete,
+  Param,
+  Get,
+  Patch,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -11,5 +20,28 @@ export class UsersController {
       createUserDto.login,
       createUserDto.password,
     );
+  }
+
+  @Put(':id')
+  update(
+    @Param('id') id: number,
+    @Body() updateUserDto: { login?: string; password?: string },
+  ) {
+    return this.usersService.updateUser(id, updateUserDto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.usersService.deleteUser(id);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.usersService.getUserById(id);
+  }
+
+  @Patch(':id/active')
+  toggleActive(@Param('id') id: number) {
+    return this.usersService.toggleActive(id);
   }
 }

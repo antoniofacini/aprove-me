@@ -25,7 +25,7 @@ module.exports = function (options, webpack) {
       {
         apply: (compiler) => {
           compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
-            findProcess('port', 3000).then(function (list) {
+            findProcess('port', 3001).then(function (list) {
               if (!list.length) return;
               kill(list[0].pid);
             });

@@ -1,13 +1,39 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
+async function submitForm(data: any): Promise<any> {
+  try {
+    const response = await axios.post(
+      "http://localhost:3001/integrations/auth",
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Network response was not ok");
+  }
+}
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { mutate } = useMutation({
+    mutationFn: submitForm,
+    onSuccess: (data) => {
+      localStorage.setItem("access_token", data.access_token);
+      router.push("/payables");
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    mutate(data);
   };
 
   return (
@@ -18,30 +44,31 @@ export default function Login() {
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
+              <label htmlFor="login" className="sr-only">
+                Login
               </label>
               <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
+                {...register("login", { required: true })}
+                id="login"
+                name="login"
+                type="text"
+                autoComplete="username"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Login"
               />
+              {errors.login && <span>This field is required</span>}
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
+                {...register("password", { required: true })}
                 id="password"
                 name="password"
                 type="password"
@@ -49,9 +76,8 @@ export default function Login() {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
+              {errors.password && <span>This field is required</span>}
             </div>
           </div>
 

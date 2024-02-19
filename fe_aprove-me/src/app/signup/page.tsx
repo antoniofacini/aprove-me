@@ -1,20 +1,42 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
+async function submitForm(data: any): Promise<any> {
+  try {
+    const response = await axios.post(
+      "http://localhost:3001/integrations/signup",
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Network response was not ok");
+  }
+}
 
 export default function Signup() {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match");
-    } else {
-      setErrorMessage("");
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
+  const { mutate } = useMutation({
+    mutationFn: submitForm,
+    onSuccess: (data) => {
+      router.push("/login");
+    },
+  });
+
+  const password = watch("password");
+  console.log(errors);
+  const onSubmit = (data: any) => {
+    mutate(data);
   };
 
   return (
@@ -25,7 +47,7 @@ export default function Signup() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -33,6 +55,7 @@ export default function Signup() {
                 Login
               </label>
               <input
+                {...register("login", { required: true })}
                 id="login"
                 name="login"
                 type="text"
@@ -40,15 +63,15 @@ export default function Signup() {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Login"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
               />
+              {errors.login && <span>This field is required</span>}
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
+                {...register("password", { required: true })}
                 id="password"
                 name="password"
                 type="password"
@@ -56,29 +79,31 @@ export default function Signup() {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
+              {errors.password && <span>This field is required</span>}
             </div>
             <div>
               <label htmlFor="confirm-password" className="sr-only">
                 Confirm Password
               </label>
               <input
+                {...register("confirmPassword", {
+                  required: true,
+                  validate: (value) =>
+                    value === password || "The passwords do not match",
+                })}
                 id="confirm-password"
-                name="confirm-password"
+                name="confirmPassword"
                 type="password"
                 autoComplete="current-password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
               />
+              {errors.confirmPassword && <span>Senhas não conferem</span>}
+              {errors.confirmPassword && <span>This field is required</span>}
             </div>
           </div>
-
-          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
           <div>
             <button
