@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../services/prisma.service';
 import { CreatePayableDto, UpdatePayableDto } from './dto/payable.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class PayableService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @InjectQueue('payable') private readonly payableQueue: Queue,
+  ) {}
 
   async getPayable(id: string) {
     return this.prisma.payable.findUnique({
@@ -44,5 +49,25 @@ export class PayableService {
     return this.prisma.payable.delete({
       where: { id },
     });
+  }
+
+  async createBatch(createPayableDtos: CreatePayableDto[]) {
+    if (createPayableDtos.length > 10000) {
+      throw new BadRequestException(
+        'Cannot process more than 10000 payables at once',
+      );
+    }
+
+    try {
+      await Promise.all(
+        createPayableDtos.map((dto) => this.payableQueue.add(dto)),
+      );
+    } catch (error) {
+      console.error('Failed to add DTOs to queue:', error);
+    }
+  }
+
+  async sendEmail(count: number) {
+    return count;
   }
 }

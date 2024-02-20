@@ -15,7 +15,7 @@ export class AssignorService {
   constructor(private prisma: PrismaService) {}
 
   @Get(':id')
-  async getAssignor(@Param('id') id: string) {
+  async getAssignor(@Param('id') id: number) {
     return this.prisma.assignor.findUnique({
       where: { id: id },
     });
@@ -28,7 +28,7 @@ export class AssignorService {
 
   @Put(':id')
   async updateAssignor(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateAssignorDto: UpdateAssignorDto,
   ) {
     return this.prisma.assignor.update({
@@ -38,7 +38,7 @@ export class AssignorService {
   }
 
   @Delete(':id')
-  async deleteAssignor(@Param('id') id: string) {
+  async deleteAssignor(@Param('id') id: number) {
     return this.prisma.assignor.delete({
       where: { id: id },
     });

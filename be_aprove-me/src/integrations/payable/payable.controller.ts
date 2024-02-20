@@ -39,4 +39,10 @@ export class PayableController {
   delete(@Param('id') id: string) {
     return this.payableService.deletePayable(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/batch')
+  async createBatch(@Body() data: any[]) {
+    await this.payableService.createBatch(data);
+  }
 }

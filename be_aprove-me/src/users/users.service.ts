@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { User } from './user.entity/user.entity';
 import { PrismaService } from '../services/prisma.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
@@ -32,6 +36,9 @@ export class UsersService {
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    if (!id) {
+      throw new BadRequestException('ID is required to update a user');
+    }
     return this.prisma.user.update({
       where: { id: id },
       data: updateUserDto,

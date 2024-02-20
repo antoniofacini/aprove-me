@@ -19,7 +19,7 @@ export class CreatePayableDto {
 
   @IsNotEmpty()
   @IsString()
-  assignorId: string;
+  assignorId: number;
 }
 
 export class UpdatePayableDto {
@@ -37,5 +37,5 @@ export class UpdatePayableDto {
 
   @IsOptional()
   @IsInt()
-  assignor?: string;
+  assignor?: number;
 }

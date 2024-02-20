@@ -1,0 +1,16 @@
+version: '3'
+services:
+  frontend:
+    build: ./fe_aprove-me
+    ports:
+      - 3000:3000
+  backend:
+    build: ./be_aprove-me
+    ports:
+      - 3001:3001
+    depends_on:
+      - redis
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

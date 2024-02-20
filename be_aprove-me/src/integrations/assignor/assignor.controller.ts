@@ -19,7 +19,7 @@ export class AssignorController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.assignorService.getAssignor(id);
   }
 
@@ -32,7 +32,7 @@ export class AssignorController {
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateAssignorDto: UpdateAssignorDto,
   ) {
     return this.assignorService.updateAssignor(id, updateAssignorDto);
@@ -40,7 +40,7 @@ export class AssignorController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id') id: number) {
     return this.assignorService.deleteAssignor(id);
   }
 }
